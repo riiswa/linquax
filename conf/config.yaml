@@ -1,0 +1,14 @@
+env_id: inverted_pendulum  # ID of the environment
+seed: 0  # Random seed
+
+horizon: 500  # Horizon length for the LQR
+noise: 1.0  # Noise for the LQR
+warmup_steps: 50  # Warmup steps for the LQR
+improved_exploration_steps: 0  # Improved Exploration steps for the LQR
+policy: OFULQ
+policy_kwargs: {}
+exp_name: results
+
+#hydra:
+#  launcher:
+#    max_nbytes: null
