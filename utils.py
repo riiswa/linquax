@@ -128,7 +128,7 @@ def plot_cost_landscape(ofulq, A: jnp.ndarray, B: jnp.ndarray, V: jnp.ndarray):
 
             mat = ax.matshow(jnp.log(lv), cmap=cmap, extent=[-1, 1, -1, 1])
             ax.scatter([0], [0], color='black', marker='x', s=25)
-            ax.text(0.05, -0.1, "$\widetilde{\Theta}$", fontsize=14)
+            ax.text(0.05, -0.1, r"$\widetilde{\Theta}$", fontsize=14)
 
             fig.colorbar(mat, ax=ax, label="Log cost")  # Use fig.colorbar() instead of plt.colorbar()
 

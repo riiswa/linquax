@@ -16,10 +16,9 @@ class TS(OFULQ):
 
     def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0):
         super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
-        self.delta = delta
 
     @partial(jax.jit, static_argnums=(0, 5, 6))
-    def rejection_sampling(self, rng, Theta, V, P0, n_samples: int = 1, max_tries: int = 10000):
+    def rejection_sampling(self, rng, Theta, V, P0, n_samples: int = 1, max_tries: int = 1000):
         W = inv_sqrt(V)[jnp.newaxis, :]
         beta = self.confidence_threshold(V)
         def step_fn(carry):

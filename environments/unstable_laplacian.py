@@ -19,4 +19,4 @@ class UnstableLaplacian(LinearQuadraticEnv):
 
     @property
     def name(self) -> str:
-        return "Unstable Laplacian Dynamics"
+        return "Unstable Laplacian"

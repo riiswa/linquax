@@ -19,4 +19,4 @@ class LargeTransient(LinearQuadraticEnv):
 
     @property
     def name(self) -> str:
-        return "Large Transient Dynamics"
+        return "Large Transient"

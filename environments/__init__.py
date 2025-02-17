@@ -4,6 +4,8 @@ from environments.inverted_pendulum import InvertedPendulum
 from environments.uav import UAV
 from environments.unstable_laplacian import UnstableLaplacian
 from environments.large_transient import LargeTransient
+from environments.chained_integrator import ChainedIntegrator
+from environments.not_controllable import NotControllable
 
 
 env_dict = {
@@ -12,7 +14,8 @@ env_dict = {
     "uav": UAV,
     "unstable_laplacian": UnstableLaplacian,
     "large_transient": LargeTransient,
-
+    "not_controllable": NotControllable,
+    "chained_integrator": ChainedIntegrator,
 }
 
 def make_env(id: str):
