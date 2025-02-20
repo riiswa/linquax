@@ -43,13 +43,12 @@ def experiment(cfg : ExperimentConfig) -> None:
     controller_state = controller.init(rng_init, cfg.horizon)
 
     print(f"[{file_path}] Starting experiment: {cfg.exp_name}")
-    f = jax.jit(env.simulate)
     args = (rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
-    f.lower(*args).compile()
+    env.simulate.lower(*args).compile()
     env.simulate()
 
     start = time.time()
-    _, _, costs = jax.block_until_ready(f(*args))
+    _, _, costs = jax.block_until_ready(env.simulate(*args))
     end = time.time()
 
     os.makedirs(path, exist_ok=True)
