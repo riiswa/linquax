@@ -1,5 +1,6 @@
 import importlib
 import os.path
+import sys
 import time
 from dataclasses import dataclass
 
@@ -40,12 +41,17 @@ def experiment(cfg : ExperimentConfig) -> None:
     rng = jax.random.PRNGKey(cfg.seed)
     rng, rng_init = jax.random.split(rng)
 
+    gpus = jax.devices('gpu')
+    print(f"Available GPUs are {gpus}", file=sys.stderr)
+
     controller_state = controller.init(rng_init, cfg.horizon)
 
     print(f"[{file_path}] Starting experiment: {cfg.exp_name}")
 
     start = time.time()
-    _, _, costs = jax.block_until_ready(env.simulate(rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon))
+    _, _, costs = jax.block_until_ready(
+        jax.jit(env.simulate, static_argnums=(2, 3, 4), device=gpus[cfg.seed % 2])(rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
+    )
     end = time.time()
 
     os.makedirs(path, exist_ok=True)
