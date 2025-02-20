@@ -33,21 +33,30 @@ def experiment(cfg : ExperimentConfig) -> None:
         **cfg.policy_kwargs
     )
 
+    path = os.path.join(cfg.exp_name, env.name, controller.name)
+    file_path = os.path.join(path,
+                             f"result__seed_{cfg.seed}__horizon_{cfg.horizon}__noise_{cfg.noise}__ws_{cfg.warmup_steps}__es_{cfg.improved_exploration_steps}")
+
     rng = jax.random.PRNGKey(cfg.seed)
     rng, rng_init = jax.random.split(rng)
 
     controller_state = controller.init(rng_init, cfg.horizon)
 
-    start = time.time()
-    _, _, costs = env.simulate(rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
-    end = time.time()
+    print(f"[{file_path}] Starting experiment: {cfg.exp_name}")
+    f = jax.jit(env.simulate)
+    args = (rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
+    f.lower(*args).compile()
+    env.simulate()
 
-    path = os.path.join(cfg.exp_name, env.name, controller.name)
+    start = time.time()
+    _, _, costs = jax.block_until_ready(f(*args))
+    end = time.time()
 
     os.makedirs(path, exist_ok=True)
 
-    file_path = os.path.join(path, f"result__seed_{cfg.seed}__horizon_{cfg.horizon}__noise_{cfg.noise}__ws_{cfg.warmup_steps}__es_{cfg.improved_exploration_steps}")
     jax.numpy.save(file_path, {'regret': costs - controller.cost_star, 'time': end - start})
+
+    print(f"[{file_path}] Simulation completed in {end - start:.4f} seconds.")
 
 if __name__ == "__main__":
     experiment()
