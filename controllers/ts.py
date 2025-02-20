@@ -12,9 +12,10 @@ from utils import inv_sqrt
 class TS(OFULQ):
     @property
     def name(self) -> str:
-        return "TS-LQR"  if self.improved_exploration_steps == 0 else "TSAC"
+        return "TS-LQ"
 
     def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0):
+        delta = delta/(8*500)
         super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
 
     @partial(jax.jit, static_argnums=(0, 5, 6))
@@ -26,23 +27,6 @@ class TS(OFULQ):
             rng, rng_noise = jax.random.split(rng)
             noise = jax.random.normal(rng, (n_samples, *Theta.shape))
             samples = jnp.where(accepted[:, jnp.newaxis, jnp.newaxis], samples, Theta[jnp.newaxis, :] + beta * noise @ W)
-            accepted = jax.vmap(lambda T, a: jax.lax.cond(a, lambda _: True, partial(self.is_stabilizable, P0=P0), T), in_axes=(0, 0))(samples, accepted)
-            # accepted = jnp.array([
-            #     jax.lax.cond(a, lambda _: True, self.is_stabilizable, T)
-            #     for T, a in zip(samples, accepted)
-            # ])
-            return rng, samples, accepted, i + 1
-        def step_fn_(carry):
-            rng, samples, accepted, i = carry
-            rng, rng_noise, rng_uniform = jax.random.split(rng, 3)
-            noise = jax.random.normal(rng_noise, (n_samples, *Theta.shape))
-            uniform_samples = jax.random.uniform(rng_uniform, (n_samples,))
-            power = 1.0 / (Theta.shape[0] * Theta.shape[1])
-            uniform_scaling = jnp.power(uniform_samples, power)
-            noise_norms = jnp.linalg.norm(noise, ord='fro', axis=(1, 2))
-            scaled_noise = noise * (uniform_scaling / noise_norms)[:, jnp.newaxis, jnp.newaxis]
-            new_samples = Theta[jnp.newaxis, :] + jnp.sqrt(beta) * scaled_noise @ W
-            samples = jnp.where(accepted[:, jnp.newaxis, jnp.newaxis], samples, new_samples)
             accepted = jax.vmap(lambda T, a: jax.lax.cond(a, lambda _: True, partial(self.is_stabilizable, P0=P0), T), in_axes=(0, 0))(samples, accepted)
             # accepted = jnp.array([
             #     jax.lax.cond(a, lambda _: True, self.is_stabilizable, T)

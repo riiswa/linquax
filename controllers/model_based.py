@@ -12,6 +12,7 @@ from utils import dare
 @dataclass
 class ModelBasedState(ControllerState):
     t: int
+    tau: int
     V: jnp.ndarray
     V_prev: jnp.ndarray
 
@@ -60,7 +61,7 @@ class ModelBased(Controller):
         P = dare(A, B, self.env.Q, self.env.R, controller_state.P)
         K = jnp.linalg.inv(B.T @ P @ B + self.env.R) @ (B.T @ P @ A)
 
-        return controller_state.replace(P=P, K=K, V_prev=controller_state.V)
+        return controller_state.replace(P=P, K=K, V_prev=controller_state.V, tau=0)
 
     @partial(jax.jit, static_argnums=(0, 2))
     def init(
@@ -70,6 +71,7 @@ class ModelBased(Controller):
     ) -> ControllerState:
         controller_state = ModelBasedState(
             t=0,
+            tau = 0,
             V=jnp.identity(self.state_dim + self.action_dim) * self.weight_decay,
             V_prev=jnp.identity(self.state_dim + self.action_dim) * self.weight_decay,
             states=jnp.zeros((self.warmup_steps + num_steps, self.state_dim)),
@@ -108,7 +110,7 @@ class ModelBased(Controller):
                 next_states=controller_state.next_states.at[controller_state.t].set(
                     next_state
                 ),
-                V=controller_state.V + z @ z.T
+                #V=controller_state.V + z @ z.T
             )
 
         rng_simulation, rng_update = jax.random.split(rng)
@@ -143,7 +145,7 @@ class ModelBased(Controller):
 
         controller_state = jax.lax.cond(
             (jnp.linalg.det(controller_state.V)
-            > 2 * jnp.linalg.det(controller_state.V_prev)) & (t > 10),
+            > 2 * jnp.linalg.det(controller_state.V_prev)) & (controller_state.tau >= 10),
             lambda cs: self.update(rng_update, cs),
             lambda cs: cs,
             controller_state,
@@ -169,4 +171,5 @@ class ModelBased(Controller):
                 next_state
             ),
             V = controller_state.V + z @ z.T,
+            tau=controller_state.tau + 1,
         )

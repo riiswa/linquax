@@ -14,9 +14,9 @@ from utils import dare, project_weighted_ball
 class OFULQ(ModelBased):
     @property
     def name(self):
-        return "OFULQ" if self.improved_exploration_steps == 0 else "StabL"
+        return "OFULQ"
 
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, learning_rate: float = 1e-6, excitation: float = 2.0):
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, learning_rate: float = 1e-3, excitation: float = 2.0):
         super().__init__(env, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
         self.delta = delta
 
@@ -53,7 +53,7 @@ class OFULQ(ModelBased):
         return (c < self.D) & (c > 0)
 
 
-    def pgd(self, Theta, hyperparams_proj, P0, max_steps: int = 500, patience: int = 5, tol: float = 1e-2):
+    def pgd(self, Theta, hyperparams_proj, P0, max_steps: int = 1000, patience: int = 20, tol: float = 1e-3):
         def step(carry):
             Theta, opt_state, best_Theta, best_cost, patience_count, step_count = carry
 
@@ -89,8 +89,6 @@ class OFULQ(ModelBased):
             step,
             initial_carry
         )
-
-        #jax.debug.print("Steps {i}, {t1}", i=final_state[-1], t1=0)
 
         return final_state[2]
 
