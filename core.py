@@ -46,7 +46,7 @@ class LinearQuadraticEnv(ABC):
 
         return next_state + noise, state_cost + control_cost
 
-    @partial(jax.jit, static_argnums=(0, 3, 4, 5))
+    #@partial(jax.jit, static_argnums=(0, 3, 4, 5))
     def simulate(
         self,
         rng: jax.random.PRNGKey,
