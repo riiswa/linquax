@@ -14,7 +14,7 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-env_ids=("boeing747" "chained_integrator" "large_transient" "not_controllable" "uav" "unstable_laplacian" "ac1" "ac3" "ac4" "ac6" "ac8" "bdt1" "dis1" "dis2" "he1" "he2" "je2" "psm")
+env_ids=("boeing747" "chained_integrator" "large_transient" "not_controllable" "uav" "unstable_laplacian")
 strategies=("OFULQ" "TS" "MED")
 output_file="processed_pairs.log"
 

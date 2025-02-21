@@ -9,6 +9,9 @@ from matplotlib import pyplot as plt
 
 from run_experiment import ExperimentConfig
 
+import jax
+jax.config.update("jax_enable_x64", True)
+
 order = ["MED-LQ", "OFULQ", "StabL", "TS-LQR", "TSAC"]
 
 def sort_controller(lst):
@@ -41,7 +44,7 @@ def compute_stats(results):
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def plot(cfg : ExperimentConfig) -> None:
-    envs = [d for d in listdir(cfg.exp_name) if isdir(os.path.join(cfg.exp_name, d))] * 8
+    envs = [d for d in listdir(cfg.exp_name) if isdir(os.path.join(cfg.exp_name, d))]
     controllers = set([d for env in envs for d in listdir(os.path.join(cfg.exp_name, env)) if isdir(os.path.join(cfg.exp_name, env, d))])
     controllers = sort_controller(controllers)
 
@@ -73,7 +76,7 @@ def plot(cfg : ExperimentConfig) -> None:
             if idx >= (n - 1) * 4:
                 ax.set_xlabel('Time Steps', fontsize=12)
 
-            #ax.set_yscale('log', base=10)
+            ax.set_yscale('log')
 
         # Set shared labels
         #fig.text(0.5, 0.0, 'Time Steps', ha='center', fontsize=12)
@@ -100,7 +103,7 @@ def plot(cfg : ExperimentConfig) -> None:
     with load_theme("scientific"):
         plt.rcParams["font.family"] = "Times New Roman"
         fig_legend = plt.figure()
-        fig_legend.legend(*ax.get_legend_handles_labels(), loc='center', frameon=False, ncol=len(controllers))
+        fig_legend.legend(*axes[0].get_legend_handles_labels(), loc='center', frameon=False, ncol=len(controllers))
         fig_legend.savefig(os.path.join(cfg.exp_name, 'legend.pdf'), bbox_inches='tight')
 
 if __name__ == "__main__":

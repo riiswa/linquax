@@ -31,6 +31,7 @@ class OFULQ(ModelBased):
         self.cost_star = self.cost(self.Theta_star)
         self.D = self.cost_star * 100
 
+    @partial(jax.jit, static_argnums=(0,))
     def confidence_threshold(self, V):
         # return jnp.trace((Theta_hat - self.Theta_star) @ V @ (Theta_hat - self.Theta_star).T)
         det_V = jnp.linalg.det(V)
@@ -52,8 +53,8 @@ class OFULQ(ModelBased):
         c = self.cost(Theta, P0)
         return (c < self.D) & (c > 0)
 
-
-    def pgd(self, Theta, hyperparams_proj, P0, max_steps: int = 1000, patience: int = 20, tol: float = 1e-3):
+    @partial(jax.jit, static_argnums=(0, 4))
+    def pgd(self, Theta, hyperparams_proj, P0, max_steps: int = 500, patience: int = 5, tol: float = 1e-3):
         def step(carry):
             Theta, opt_state, best_Theta, best_cost, patience_count, step_count = carry
 

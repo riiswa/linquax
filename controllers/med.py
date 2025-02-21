@@ -27,7 +27,7 @@ class MED(OFULQ):
     def name(self) -> str:
         return "MED-LQ"
 
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0, n_samples: int = 32):
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0, n_samples: int = 128):
         super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
         self.n_samples = n_samples
 
@@ -88,10 +88,13 @@ class MED(OFULQ):
 
         ts = jnp.zeros(self.n_samples)
         fun = jax.vmap(jax.value_and_grad(loss), in_axes=(0, 0, None, 0))
+        res0 = None
         for i in range(20):
             res = fun(ts, candidates, K_nom, K_candidates)
+            if i == 0:
+                res0 = res
             ts = ts - res[0] / res[1]
-        mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.)
+        mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
 
         Theta_confusing = jnp.where(mask[:, jnp.newaxis, jnp.newaxis], jax.vmap(interp, in_axes=(0, 0))(ts, candidates),
                                     candidates)
