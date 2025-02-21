@@ -11,6 +11,7 @@ export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="/tmp/jax_cache"
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.03
 export CUDA_VISIBLE_DEVICES=0,1
+export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 env_ids=("inverted_pendulum")
 for env_id in "${env_ids[@]}"; do
   echo "Running experiment for env_id: $env_id"

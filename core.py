@@ -34,7 +34,7 @@ class LinearQuadraticEnv(ABC):
     def reset(self, rng: jax.random.PRNGKey):
         return jnp.zeros(self.A.shape[0])
 
-    @partial(jax.jit, static_argnums=(0,), device='cpu')
+    @partial(jax.jit, static_argnums=(0,))
     def step_fn(
         self, rng_key: jax.random.PRNGKey, state: jnp.ndarray, action: jnp.ndarray
     ) -> (jnp.ndarray, jnp.ndarray):
@@ -46,7 +46,7 @@ class LinearQuadraticEnv(ABC):
 
         return next_state + noise, state_cost + control_cost
 
-    #@partial(jax.jit, static_argnums=(0, 3, 4, 5))
+    #partial(jax.jit, static_argnums=(0, 3, 4, 5))
     def simulate(
         self,
         rng: jax.random.PRNGKey,
