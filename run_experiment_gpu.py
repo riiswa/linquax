@@ -77,15 +77,15 @@ def experiment(cfg : ExperimentConfig) -> None:
 
     start = time.time()
     _, _, costs = jax.block_until_ready(f())
-    emd = time.time()
+    end = time.time()
+
+    print(f"[{path}] Simulation completed in {end - start:.4f} seconds.")
 
     os.makedirs(path, exist_ok=True)
 
     for seed in range(cfg.n_seeds):
         jax.numpy.save(get_file_path(seed), {"regret": costs[seed] - cost_star})
         jax.numpy.save(os.path.join(path, "time"), end - start)
-
-    print(f"[{path}] Simulation completed in {end - start:.4f} seconds.")
 
 if __name__ == "__main__":
     experiment()
