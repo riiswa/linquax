@@ -76,7 +76,7 @@ def experiment(cfg : ExperimentConfig) -> None:
     print(f"[{path}] Simulation start.")
 
     start = time.time()
-    _, _, costs = jax.block_until_ready(f())
+    costs = jax.block_until_ready(f())
     end = time.time()
 
     print(f"[{path}] Simulation completed in {end - start:.4f} seconds.")
