@@ -14,8 +14,8 @@ export JAX_COMPILATION_CACHE_DIR="/tmp/jax_cache"
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-env_ids='boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian'
-strategies='OFULQ,TS,MED'
+env_ids='boeing747'
+strategies='MED'
 
 
-python run_experiment_gpu.py --multirun policy=$strategies env_id=$env_ids
+python run_experiment_gpu.py  policy=$strategies env_id=$env_ids
