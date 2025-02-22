@@ -47,7 +47,7 @@ def experiment(cfg : ExperimentConfig) -> None:
 
     start = time.time()
     _, _, costs = jax.block_until_ready(
-        env.simulate(rng_init, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
+        env.simulate(rng, controller_state, controller.policy_fn, controller.on_completion_fn, cfg.horizon)
     )
     end = time.time()
 
