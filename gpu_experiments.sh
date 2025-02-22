@@ -9,8 +9,8 @@
 
 export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="/tmp/jax_cache"
-export XLA_PYTHON_CLIENT_PREALLOCATE=false
-export XLA_PYTHON_CLIENT_MEM_FRACTION=12.4
+#export XLA_PYTHON_CLIENT_PREALLOCATE=false
+#export XLA_PYTHON_CLIENT_MEM_FRACTION=12.4
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
@@ -18,4 +18,4 @@ env_ids='boeing747,chained_integrator,large_transient,not_controllable,uav,unsta
 strategies='OFULQ,TS,MED'
 
 
-python run_experiment_gpu.py --multirun hydra/launcher=joblib policy=$strategies env_id=$env_ids
+python run_experiment_gpu.py --multirun policy=$strategies env_id=$env_ids
