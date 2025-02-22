@@ -8,24 +8,31 @@
 #SBATCH --constraint=a100
 
 export JAX_ENABLE_X64=True
-export JAX_COMPILATION_CACHE_DIR="/tmp/jax_cache"
+export JAX_COMPILATION_CACHE_DIR="./jax_cache"
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-env_ids=("inverted_pendulum" "boeing747" "chained_integrator" "large_transient" "not_controllable" "uav" "unstable_laplacian")
-strategies=("OFULQ" "TS" "MED")
-output_file="processed_pairs.log"
+#env_ids=("inverted_pendulum" "boeing747" "chained_integrator" "large_transient" "not_controllable" "uav" "unstable_laplacian")
+#strategies=("OFULQ" "TS" "MED")
 
-# Clear the output file before starting
-echo "Processed env/strategy pairs:" > "$output_file"
+python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=OFULQ,TS,MED env_id=inverted_pendulum,boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian
 
-for env_id in "${env_ids[@]}"; do
-  for strategy in "${strategies[@]}"; do
-    echo "Running experiment for env_id: $env_id with strategy: $strategy"
-    python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(64)' policy=$strategy env_id=$env_id
-    echo "$env_id/$strategy" >> "$output_file"  # Log the processed pair
-  done
-  echo "End of $env_id" >> "$output_file"
-done
+
+
+
+
+#output_file="processed_pairs.log"
+#
+## Clear the output file before starting
+#echo "Processed env/strategy pairs:" > "$output_file"
+#
+#for env_id in "${env_ids[@]}"; do
+#  for strategy in "${strategies[@]}"; do
+#    echo "Running experiment for env_id: $env_id with strategy: $strategy"
+#    python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=$strategy env_id=$env_id
+#    echo "$env_id/$strategy" >> "$output_file"  # Log the processed pair
+#  done
+#  echo "End of $env_id" >> "$output_file"
+#done

@@ -18,7 +18,6 @@ class Optimal(Controller):
             self.env.B.T @ P @ self.env.A
         )
 
-    @partial(jax.jit, static_argnums=(0, 2, 3))
     def init(
         self,
         rng: jax.random.PRNGKey,

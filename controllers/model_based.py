@@ -63,7 +63,6 @@ class ModelBased(Controller):
 
         return controller_state.replace(P=P, K=K, V_prev=controller_state.V, tau=0)
 
-    @partial(jax.jit, static_argnums=(0, 2))
     def init(
         self,
         rng: jax.random.PRNGKey,
