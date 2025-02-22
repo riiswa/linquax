@@ -14,10 +14,8 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=.12
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-env_ids=("boeing747" "chained_integrator" "large_transient" "not_controllable" "uav" "unstable_laplacian")
-strategies=("OFULQ" "TS" "MED")
+env_ids='boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian'
+strategies='OFULQ,TS,MED'
 
-IFS=',' env_ids_joined="${env_ids[*]}"
-IFS=',' strategies_joined="${strategies[*]}"
 
-python run_experiment_gpu.py --multirun hydra/launcher=joblib policy=$strategies_joined env_id=$env_ids_joined
+python run_experiment_gpu.py --multirun hydra/launcher=joblib policy=$strategies env_id=$env_ids
