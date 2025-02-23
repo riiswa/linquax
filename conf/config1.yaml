@@ -8,6 +8,7 @@ improved_exploration_steps: 0  # Improved Exploration steps for the LQR
 policy: OFULQ
 policy_kwargs: {}
 exp_name: results1
+progress_file: progress1.log
 
 #hydra:
 #  launcher:

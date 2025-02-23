@@ -1,6 +1,5 @@
 import importlib
 import os.path
-import sys
 import time
 from dataclasses import dataclass
 
@@ -22,6 +21,7 @@ class ExperimentConfig(DictConfig):
     policy: str
     policy_kwargs: dict
     exp_name: str
+    progress_file: str
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def experiment(cfg : ExperimentConfig) -> None:
@@ -56,6 +56,9 @@ def experiment(cfg : ExperimentConfig) -> None:
     jax.numpy.save(file_path, {'regret': costs - controller.cost_star, 'time': end - start})
 
     print(f"[{file_path}] Simulation completed in {end - start:.4f} seconds.")
+
+    with open(cfg.progress_file, 'a+') as f:
+        f.write(path + '\n')
 
 if __name__ == "__main__":
     experiment()
