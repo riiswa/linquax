@@ -15,7 +15,7 @@ export JAX_COMPILATION_CACHE_DIR="./jax_cache"
 #export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=OFULQ,TS,MED env_id=inverted_pendulum,boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian
+python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(64)' policy=OFULQ,TS,MED env_id=inverted_pendulum,boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian
 
 
 
