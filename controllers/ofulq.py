@@ -29,7 +29,7 @@ class OFULQ(ModelBased):
         self.S = jnp.trace(self.Theta_star @ self.Theta_star.T)
 
         self.cost_star = self.cost(self.Theta_star)
-        self.D = self.cost_star * 100
+        self.D = self.cost_star * 20
 
     @partial(jax.jit, static_argnums=(0,))
     def confidence_threshold(self, V):
