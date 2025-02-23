@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=linquax         # Job name
-#SBATCH --output=output.log        # Output file
-#SBATCH --error=error.log          # Error file
+#SBATCH --output=output1.log        # Output file
+#SBATCH --error=error1.log          # Error file
 #SBATCH --time=24:00:00            # Maximum run time (5 hours)
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --cpus-per-task=64         # Number of CPU cores per task
