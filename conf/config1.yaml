@@ -3,11 +3,11 @@ seed: 0  # Random seed
 
 horizon: 500  # Horizon length for the LQR
 noise: 1.0  # Noise for the LQR
-warmup_steps: 0  # Warmup steps for the LQR
-improved_exploration_steps: 35  # Improved Exploration steps for the LQR
+warmup_steps: 50  # Warmup steps for the LQR
+improved_exploration_steps: 0  # Improved Exploration steps for the LQR
 policy: OFULQ
 policy_kwargs: {}
-exp_name: results
+exp_name: results1
 
 #hydra:
 #  launcher:

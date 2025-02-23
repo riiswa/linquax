@@ -12,7 +12,7 @@ from utils import inv_sqrt
 class TS(OFULQ):
     @property
     def name(self) -> str:
-        return "TS-LQ"
+        return "TS-LQ" if self.improved_exploration_steps == 0 else "TSAC"
 
     def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0):
         #delta = delta/(8*500)
