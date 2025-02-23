@@ -1,11 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=linquax         # Job name
+#SBATCH --job-name=linquax1         # Job name
 #SBATCH --output=output_.log        # Output file
 #SBATCH --error=error_.log          # Error file
 #SBATCH --time=05:00:00            # Maximum run time (5 hours)
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --cpus-per-task=64         # Number of CPU cores per task
 #SBATCH --constraint=a100
+#SBATCH --exclusive
 
 export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="./jax_cache"

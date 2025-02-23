@@ -6,6 +6,7 @@
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --cpus-per-task=64         # Number of CPU cores per task
 #SBATCH --constraint=a100
+#SBATCH --exclusive
 
 export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="./jax_cache"
