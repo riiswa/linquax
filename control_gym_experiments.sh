@@ -4,18 +4,18 @@
 #SBATCH --error=error1.log          # Error file
 #SBATCH --time=24:00:00            # Maximum run time (5 hours)
 #SBATCH --nodes=1                  # Number of nodes
-#SBATCH --cpus-per-task=48         # Number of CPU cores per task
-#SBATCH --constraint=a100
-#SBATCH --exclusive
+#SBATCH --cpus-per-task=128         # Number of CPU cores per task
+##SBATCH --constraint=a100
+##SBATCH --exclusive
 
 export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="./jax_cache"
-export XLA_PYTHON_CLIENT_PREALLOCATE=false
-export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
-export CUDA_VISIBLE_DEVICES=0,1
-# export XLA_PYTHON_CLIENT_ALLOCATOR=platform
+#export XLA_PYTHON_CLIENT_PREALLOCATE=false
+#export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
+#export CUDA_VISIBLE_DEVICES=0,1
+## export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(32)' policy=OFULQ,TS,MED env_id=ac1,ac3,ac6,ac8,ac10,dis1,dis2,he1,he2,he3,psm,cm1
+python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(32)' policy=OFULQ,TS,MED env_id=ac1,ac2,ac3,ac4,ac5,ac6,ac8,ac10,bdt1,cm1,dis1,dis2,he1,he2,he3,psm,je1,je2
 
 
 

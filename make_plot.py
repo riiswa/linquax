@@ -38,20 +38,39 @@ def compute_stats(results):
         'median': median,
         'q3': q3,
         'mean': results[:, -1].mean(),
-        'std': results[:, -1].std(),
+        #'std': results[:, -1].std(),
     }
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def plot(cfg : ExperimentConfig) -> None:
     envs = [d for d in listdir(cfg.exp_name) if isdir(os.path.join(cfg.exp_name, d))]
+    #envs = [d for d in envs if d != "controlgym_ac6" and d != "controlgym_ac10" and d != "controlgym_cm1"]
+
     controllers = set([d for env in envs for d in listdir(os.path.join(cfg.exp_name, env)) if isdir(os.path.join(cfg.exp_name, env, d))])
     controllers = sort_controller(controllers)
+
+    filtered_envs = []
+
+    for idx, env in enumerate(envs):
+        count = 0
+        for i, controller in enumerate(controllers):
+            d = os.path.join(cfg.exp_name, env, controller)
+            data = [np.load(os.path.join(d, f), allow_pickle=True).item() for f in listdir(d) if f.endswith(".npy")]
+            stats = compute_stats(np.cumsum(np.vstack([np.float64(d['regret']) for d in data]), axis=1))
+            if not np.isnan(stats['iqm'][-1]):
+                count += 1
+        if count > 0:
+            filtered_envs.append(env)
+    print("Some environments are skipped:", set(envs) -set(filtered_envs))
+
+    filtered_envs.sort(key=lambda x: 0 if "controlgym" not in x else 1)
+
 
     colors = ["#ff1f5b", "#00cd6c", "#009ade", "#af58ba"]
     markers = ["o", "s", "^", "x"]
 
-    n = (len(envs)+ 3) // 4  # Compute rows needed for n*4 grid
+    n = (len(filtered_envs)+ 3) // 4  # Compute rows needed for n*4 grid
     scale = 0.75
 
     with load_theme("scientific"):
@@ -59,7 +78,7 @@ def plot(cfg : ExperimentConfig) -> None:
         fig, axes = plt.subplots(n, 4, figsize=(13 *scale, (2.25 * n)*scale), dpi=300, sharex=True)
         axes = axes.flatten()  # Flatten for easy iteration
 
-        for idx, env in enumerate(envs):
+        for idx, env in enumerate(filtered_envs):
             ax = axes[idx]
             for i, controller in enumerate(controllers):
                 d = os.path.join(cfg.exp_name, env, controller)
@@ -70,7 +89,7 @@ def plot(cfg : ExperimentConfig) -> None:
                 ax.plot(stats['iqm'], lw=2, marker=markers[i], markersize=5, label=controller, markevery=50,
                         color=colors[i], zorder=2)
 
-            ax.set_title(env, fontsize=16)
+            ax.set_title(env.replace("_", "/"), fontsize=16)
             if idx % 4 == 0:
                 ax.set_ylabel('Cumulative Regret', fontsize=12)
             if idx >= (n - 1) * 4:

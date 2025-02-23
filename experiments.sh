@@ -5,14 +5,14 @@
 #SBATCH --time=05:00:00            # Maximum run time (5 hours)
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --cpus-per-task=64         # Number of CPU cores per task
-#SBATCH --constraint=a100
-#SBATCH --exclusive
+##SBATCH --constraint=a100
+##SBATCH --exclusive
 
 export JAX_ENABLE_X64=True
 export JAX_COMPILATION_CACHE_DIR="./jax_cache"
-export XLA_PYTHON_CLIENT_PREALLOCATE=false
-export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
-export CUDA_VISIBLE_DEVICES=0,1
+#export XLA_PYTHON_CLIENT_PREALLOCATE=false
+#export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
+#export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
 python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=OFULQ,TS,MED env_id=inverted_pendulum,boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian
