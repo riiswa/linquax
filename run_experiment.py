@@ -34,7 +34,7 @@ def experiment(cfg : ExperimentConfig) -> None:
         **cfg.policy_kwargs
     )
 
-    path = os.path.join(cfg.exp_name, env.name, controller.name)
+    path = os.path.join(cfg.exp_name, env.name.replace("/", "_"), controller.name)
     file_path = os.path.join(path,
                              f"result__seed_{cfg.seed}__horizon_{cfg.horizon}__noise_{cfg.noise}__ws_{cfg.warmup_steps}__es_{cfg.improved_exploration_steps}")
 

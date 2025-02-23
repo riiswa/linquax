@@ -2,7 +2,7 @@
 #SBATCH --job-name=linquax         # Job name
 #SBATCH --output=output.log        # Output file
 #SBATCH --error=error.log          # Error file
-#SBATCH --time=05:00:00            # Maximum run time (5 hours)
+#SBATCH --time=24:00:00            # Maximum run time (5 hours)
 #SBATCH --nodes=1                  # Number of nodes
 #SBATCH --cpus-per-task=64         # Number of CPU cores per task
 #SBATCH --constraint=a100
@@ -14,7 +14,7 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=.075
 export CUDA_VISIBLE_DEVICES=0,1
 # export XLA_PYTHON_CLIENT_ALLOCATOR=platform
 
-python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=OFULQ,TS,MED env_id=inverted_pendulum,boeing747,chained_integrator,large_transient,not_controllable,uav,unstable_laplacian
+python run_experiment.py --multirun hydra/launcher=joblib 'seed=range(48)' policy=OFULQ,TS,MED env_id=ac1,ac3,ac6,ac8,ac10,bdt1,dis1,dis2,he1,he2,he3,psm,cm1,je2
 
 
 
