@@ -75,7 +75,7 @@ def plot(cfg : ExperimentConfig) -> None:
 
     with load_theme("scientific"):
         plt.rcParams["font.family"] = "Times New Roman"
-        fig, axes = plt.subplots(n, 4, figsize=(13 *scale, (2.25 * n)*scale), dpi=300, sharex=True)
+        fig, axes = plt.subplots(n, 4, figsize=(13 *scale, (2. * n)*scale), dpi=300, sharex=True)
         axes = axes.flatten()  # Flatten for easy iteration
 
         for idx, env in enumerate(filtered_envs):
@@ -86,12 +86,12 @@ def plot(cfg : ExperimentConfig) -> None:
                 stats = compute_stats(np.cumsum(np.vstack([np.float64(d['regret']) for d in data]), axis=1))
 
                 ax.fill_between(np.arange(cfg.horizon), stats['q1'], stats['q3'], alpha=0.2, color=colors[i], zorder=2)
-                ax.plot(stats['iqm'], lw=2, marker=markers[i], markersize=5, label=controller, markevery=50,
+                ax.plot(stats['iqm'], lw=2, marker=markers[i], markersize=5, label=controller.replace("LQR", "LQ"), markevery=50,
                         color=colors[i], zorder=2)
 
             ax.set_title(env.replace("_", "/"), fontsize=16)
             if idx % 4 == 0:
-                ax.set_ylabel('Cumulative Regret', fontsize=12)
+                ax.set_ylabel('Cumulative Regret', fontsize=11)
             if idx >= (n - 1) * 4:
                 ax.set_xlabel('Time Steps', fontsize=12)
 
