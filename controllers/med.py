@@ -5,7 +5,7 @@ import jax.numpy as jnp
 from controllers.model_based import ModelBasedState
 from core import LinearQuadraticEnv
 from controllers import OFULQ
-from utils import inv_sqrt, dare, dlyap
+from utils import dare, dlyap
 
 
 @jax.jit
@@ -78,6 +78,8 @@ class MED(OFULQ):
             eig_A_theta_K_nom = jnp.linalg.eigvals(A_theta_K_nom @ A_theta_nom_K_nom)
             eig_A_theta_nom_K = jnp.linalg.eigvals(A_theta_K @ A_theta_nom_K)
 
+            #jax.debug.print("{a} {b} {c}", a=jnp.all(jnp.abs(eig_A_theta_K) < 1), b= jnp.all(eig_A_theta_K_nom >= 0), c= jnp.all(eig_A_theta_nom_K >= 0) )
+
             # Stability conditions
             return (
                     jnp.all(jnp.abs(eig_A_theta_K) < 1) &  # Discrete-time stability (eigenvalues inside unit circle)
@@ -91,10 +93,12 @@ class MED(OFULQ):
         res0 = None
         for i in range(20):
             res = fun(ts, candidates, K_nom, K_candidates)
+            #jax.debug.print("{i} ts={ts}\nres={res}", ts=ts, res=res[0], i=i)
             if i == 0:
                 res0 = res
             ts = ts - res[0] / res[1]
-        mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
+        #mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
+        mask = (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
 
         Theta_confusing = jnp.where(mask[:, jnp.newaxis, jnp.newaxis], jax.vmap(interp, in_axes=(0, 0))(ts, candidates),
                                     candidates)
@@ -112,6 +116,7 @@ class MED(OFULQ):
 
         H = -K/U
         w = jax.nn.softmax(H, where=mask & (H < 0))
+        #jax.debug.print("{w}\n", w=w)
         Theta_hat = Theta_nom + jnp.tensordot(w, X, axes=(0, 0))
 
         A = Theta_hat[:, :self.state_dim]
