@@ -15,8 +15,8 @@ def parse_args():
                         help='Environment ID (default: inverted_pendulum)')
     parser.add_argument('--seeds', type=int, default=32,
                         help='Number of random seeds to run (default: 32)')
-    parser.add_argument('--samples', type=str, default="4,8,16,32,64,128,256,512",
-                        help='Comma-separated list of sample sizes to test (default: 4,8,16,32,64,128,256,512)')
+    parser.add_argument('--samples', type=str, default="4,16,64,128,256,512",
+                        help='Comma-separated list of sample sizes to test (default: 4,16,64,128,256,512)')
     parser.add_argument('--warmup', type=int, default=50,
                         help='Warmup steps for MED controller (default: 50)')
     parser.add_argument('--exploration', type=int, default=0,
@@ -44,18 +44,15 @@ if __name__ == "__main__":
     # Initialize environment and controller
     env = make_env(args.env_id)
     T = args.timesteps
-    controller_state = MED(env,
+    controller = MED(env,
                            warmup_steps=args.warmup,
                            improved_exploration_steps=args.exploration,
-                           n_samples=max(ns)).init(rng, T)
-
+                           n_samples=1)
+    controller_state = controller.init(rng, T)
 
     @partial(jax.jit, static_argnums=(1,))
     def run(rng, n_samples):
-        controller = MED(env,
-                         warmup_steps=args.warmup,
-                         improved_exploration_steps=args.exploration,
-                         n_samples=n_samples)
+        controller.n_samples = n_samples
         _, _, costs = env.simulate(rng,
                                    controller_state,
                                    controller.policy_fn,
@@ -84,12 +81,7 @@ if __name__ == "__main__":
                 if i != 0:
                     print(f"n={n}, seed={i}, runtime={runtime:.4f}s, regret={float(regret):.6f}")
                     # Write to CSV
-                    writer.writerow({
-                        'sample_size': n,
-                        'seed': i,
-                        'runtime': runtime,
-                        'regret': float(regret)
-                    })
+                    writer.writerow({'sample_size': n, 'seed': i, 'runtime': runtime, 'regret': float(regret)})
                     # Flush to ensure data is written even if interrupted
                     csvfile.flush()
 
