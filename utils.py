@@ -152,3 +152,4 @@ def plot_cost_landscape(ofulq, A: jnp.ndarray, B: jnp.ndarray, V: jnp.ndarray):
 def inv_sqrt(P):
     w, v = jnp.linalg.eigh(P)
     return v @ jnp.diag(1 / jnp.sqrt(w)) @ v.T
+

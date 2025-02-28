@@ -1,8 +1,10 @@
 from functools import partial
+from typing import Optional
 
 import jax
 from flax.struct import dataclass
 from jax import numpy as jnp
+from tensorboardX import SummaryWriter
 
 from controllers import Optimal
 from core import Controller, ControllerState, LinearQuadraticEnv
@@ -27,7 +29,7 @@ class ModelBasedState(ControllerState):
 
 
 class ModelBased(Controller):
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, weight_decay: float = 1e-4, excitation: float = 2.0):
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, weight_decay: float = 1e-4, excitation: float = 2.0, writer: Optional[SummaryWriter] = None):
 
         super().__init__(env)
         self.weight_decay = weight_decay
@@ -35,6 +37,11 @@ class ModelBased(Controller):
         self.warmup_steps = warmup_steps
         self.improved_exploration_steps = improved_exploration_steps
         self.excitation = excitation
+        self.writer = writer
+
+    def log_scalar(self, tag, value, step):
+        if self.writer is not None:
+            jax.experimental.io_callback(partial(self.writer.add_scalar, tag=tag), None, scalar_value=value, global_step=step)
 
     @property
     def name(self) -> str:
@@ -55,6 +62,10 @@ class ModelBased(Controller):
     @partial(jax.jit, static_argnums=(0,))
     def update(self, rng: jax.random.PRNGKey, controller_state: ModelBasedState):
         A, B = self.rls(controller_state)
+
+        self.log_scalar("loss/A", jnp.linalg.norm(A - self.env.A), controller_state.t - self.warmup_steps)
+        self.log_scalar("loss/B", jnp.linalg.norm(B - self.env.B), controller_state.t - self.warmup_steps)
+
         controller_state = self.parameter_estimation(rng, controller_state.replace(A=A, B=B))
         A = controller_state.A
         B = controller_state.B
@@ -101,7 +112,6 @@ class ModelBased(Controller):
             action: jnp.ndarray,
             next_state: jnp.ndarray,
         ) -> ControllerState:
-            z = jnp.hstack((state, action))[:, None]
             return controller_state.replace(
                 t=controller_state.t + 1,
                 states=controller_state.states.at[controller_state.t].set(state),
@@ -109,7 +119,6 @@ class ModelBased(Controller):
                 next_states=controller_state.next_states.at[controller_state.t].set(
                     next_state
                 ),
-                #V=controller_state.V + z @ z.T
             )
 
         rng_simulation, rng_update = jax.random.split(rng)
@@ -117,8 +126,6 @@ class ModelBased(Controller):
         controller_state, _, _ = self.env.simulate(
             rng_simulation, controller_state, policy_fn, on_completion_fn, self.warmup_steps
         )
-
-        #controller_state = self.update(rng_update, controller_state)
 
         return controller_state
 

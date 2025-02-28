@@ -1,7 +1,9 @@
 from functools import partial
+from typing import Optional
 
 import jax
 import jax.numpy as jnp
+from tensorboardX import SummaryWriter
 
 from controllers.model_based import ModelBasedState
 from core import LinearQuadraticEnv
@@ -14,9 +16,9 @@ class TS(OFULQ):
     def name(self) -> str:
         return "TS-LQ" if self.improved_exploration_steps == 0 else "TSAC"
 
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0):
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0, writer: Optional[SummaryWriter] = None):
         #delta = delta/(8*500)
-        super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
+        super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation, writer=writer)
 
     @partial(jax.jit, static_argnums=(0, 5, 6))
     def rejection_sampling(self, rng, Theta, V, P0, n_samples: int = 1, max_tries: int = 10000):

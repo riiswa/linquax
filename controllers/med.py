@@ -1,7 +1,10 @@
 from functools import partial
+from typing import Optional
 
 import jax
 import jax.numpy as jnp
+from tensorboardX import SummaryWriter
+
 from controllers.model_based import ModelBasedState
 from core import LinearQuadraticEnv
 from controllers import OFULQ
@@ -27,9 +30,10 @@ class MED(OFULQ):
     def name(self) -> str:
         return "MED-LQ"
 
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0, n_samples: int = 128):
-        super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, excitation: float = 2.0, n_samples: int = 128, check_stability: bool = True, writer: Optional[SummaryWriter] = None):
+        super().__init__(env, delta=delta, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation, writer=writer)
         self.n_samples = n_samples
+        self.check_stability = check_stability
 
 
     @partial(jax.jit, static_argnums=(0,))
@@ -93,12 +97,15 @@ class MED(OFULQ):
         res0 = None
         for i in range(20):
             res = fun(ts, candidates, K_nom, K_candidates)
-            #jax.debug.print("{i} ts={ts}\nres={res}", ts=ts, res=res[0], i=i)
             if i == 0:
                 res0 = res
             ts = ts - res[0] / res[1]
-        #mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
-        mask = (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
+        if self.check_stability:
+            mask = jax.vmap(stability_check, in_axes=(0, 0))(candidates, K_candidates) & (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
+        else:
+            mask = (ts > 0.) & (ts < 1.) & (res0[0] < -0.1)
+
+        self.log_scalar("metrics/mask", mask.mean(), controller_state.t - self.warmup_steps)
 
         Theta_confusing = jnp.where(mask[:, jnp.newaxis, jnp.newaxis], jax.vmap(interp, in_axes=(0, 0))(ts, candidates),
                                     candidates)
@@ -116,7 +123,6 @@ class MED(OFULQ):
 
         H = -K/U
         w = jax.nn.softmax(H, where=mask & (H < 0))
-        #jax.debug.print("{w}\n", w=w)
         Theta_hat = Theta_nom + jnp.tensordot(w, X, axes=(0, 0))
 
         A = Theta_hat[:, :self.state_dim]

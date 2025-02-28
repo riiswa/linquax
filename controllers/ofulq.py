@@ -4,6 +4,7 @@ from typing import Optional
 import jax
 import jax.numpy as jnp
 import jaxopt
+from tensorboardX import SummaryWriter
 
 from controllers.model_based import ModelBased, ModelBasedState
 from core import LinearQuadraticEnv
@@ -16,8 +17,8 @@ class OFULQ(ModelBased):
     def name(self):
         return "OFULQ" if self.improved_exploration_steps == 0 else "StabL"
 
-    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, learning_rate: float = 1e-6, excitation: float = 2.0):
-        super().__init__(env, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation)
+    def __init__(self, env: LinearQuadraticEnv, warmup_steps: int, improved_exploration_steps: int, delta = 1e-4, learning_rate: float = 1e-6, excitation: float = 2.0, writer: Optional[SummaryWriter] = None):
+        super().__init__(env, warmup_steps=warmup_steps, improved_exploration_steps=improved_exploration_steps, excitation=excitation, writer=writer)
         self.delta = delta
 
         self.solver = jaxopt.ProjectedGradient(
