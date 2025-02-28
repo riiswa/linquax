@@ -77,7 +77,7 @@ if __name__ == "__main__":
             for i in range(args.seeds + 1):
                 rng, _ = jax.random.split(rng)
                 start = time()
-                regret = run(rng, n)[-1]
+                regret = jax.block_until_ready(run(rng, n)[-1])
                 runtime = time() - start
 
                 # Skip the first run (warmup)
