@@ -2,7 +2,7 @@
 
 ## Overview
 
-LinQuAx is a flexible, efficient library for implementing and experimenting with online linear quadratic control algorithms. Built on JAX for accelerated computation, LinQuAx provides implementations of state-of-the-art control ex[;ptation strategy for LQR including MED (Minimum Empirical Divergence), OFULQ (Optimism in the Face of Uncertainty), and Thompson Sampling (TS).
+LinQuAx is a flexible, efficient library for implementing and experimenting with online linear quadratic control algorithms. Built on JAX for accelerated computation, LinQuAx provides implementations of state-of-the-art control exploration strategy for LQR including MED (Minimum Empirical Divergence), OFULQ (Optimism in the Face of Uncertainty), and Thompson Sampling (TS).
 
 ## Features
 
