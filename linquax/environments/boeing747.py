@@ -1,4 +1,4 @@
-from core import LinearQuadraticEnv
+from linquax.core import LinearQuadraticEnv
 import jax.numpy as jnp
 
 

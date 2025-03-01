@@ -5,10 +5,10 @@ import jax
 import jax.numpy as jnp
 from tensorboardX import SummaryWriter
 
-from controllers.model_based import ModelBasedState
-from core import LinearQuadraticEnv
-from controllers import OFULQ
-from utils import dare, dlyap
+from linquax.controllers.model_based import ModelBasedState
+from linquax.core import LinearQuadraticEnv
+from linquax.controllers import OFULQ
+from linquax.utils import dare, dlyap
 
 
 @jax.jit

@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 
-from core import LinearQuadraticEnv
+from linquax.core import LinearQuadraticEnv
 
 
 class UAV(LinearQuadraticEnv):

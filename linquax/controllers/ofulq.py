@@ -6,9 +6,9 @@ import jax.numpy as jnp
 import jaxopt
 from tensorboardX import SummaryWriter
 
-from controllers.model_based import ModelBased, ModelBasedState
-from core import LinearQuadraticEnv
-from utils import dare, project_weighted_ball
+from linquax.controllers.model_based import ModelBased, ModelBasedState
+from linquax.core import LinearQuadraticEnv
+from linquax.utils import dare, project_weighted_ball
 
 
 

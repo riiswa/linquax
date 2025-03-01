@@ -3,8 +3,8 @@ from functools import partial
 import jax
 from jax import numpy as jnp
 
-from core import Controller, ControllerState, LinearQuadraticEnv
-from utils import dare
+from linquax.core import Controller, ControllerState, LinearQuadraticEnv
+from linquax.utils import dare
 
 class Optimal(Controller):
     @property

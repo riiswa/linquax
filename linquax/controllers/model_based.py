@@ -6,9 +6,9 @@ from flax.struct import dataclass
 from jax import numpy as jnp
 from tensorboardX import SummaryWriter
 
-from controllers import Optimal
-from core import Controller, ControllerState, LinearQuadraticEnv
-from utils import dare
+from linquax.controllers import Optimal
+from linquax.core import Controller, ControllerState, LinearQuadraticEnv
+from linquax.utils import dare
 
 
 @dataclass
